@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>A Small Game ❤️</title>
 
-<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -16,6 +15,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .popup {
@@ -25,7 +25,9 @@ body {
   width: 340px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  animation: pop 0.5s ease;
+  animation: pop 0.4s ease;
+  position: relative;
+  z-index: 10;
 }
 
 @keyframes pop {
@@ -35,15 +37,14 @@ body {
 
 h2 {
   font-family: 'Pacifico', cursive;
-  font-size: 22px;
   color: #ff4d6d;
-  margin-bottom: 15px;
+  font-size: 22px;
 }
 
 .sub {
   font-size: 13px;
   color: #777;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 button {
@@ -62,36 +63,54 @@ button {
   box-shadow: 0 8px 15px rgba(255,77,109,0.4);
 }
 
-.yes:hover {
-  transform: scale(1.08);
-}
-
 .no {
   background: #eee;
   color: #444;
   position: relative;
 }
 
-.footer {
-  margin-top: 15px;
-  font-size: 11px;
-  color: #aaa;
+.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* hearts */
+.heart {
+  position: fixed;
+  bottom: 0;
+  font-size: 18px;
+  animation: float 4s linear forwards;
+}
+
+@keyframes float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100vh); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
+<audio id="yesSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e0d4a50fa.mp3"></audio>
+
 <div class="popup" id="box">
   <h2 id="question">Hey you 😌</h2>
   <div class="sub" id="subtext">Quick fun round. No pressure 😄</div>
   <button class="yes" onclick="next()">Yes 😄</button>
-  <button class="no" id="noBtn" onclick="next()">Hmm okay</button>
-  <div class="footer">💗 totally harmless questions</div>
+  <button class="no" id="noBtn" onclick="handleNoClick()">No 😌</button>
 </div>
 
 <script>
 let step = 0;
+let yesScale = 1;
+let noClickCount = 0;
 
 const questions = [
   {q:"Can I steal 30 seconds of your time? ⏳", s:"I promise I’ll return it 😇"},
@@ -102,30 +121,44 @@ const questions = [
   {q:"Ever felt comfortable talking to someone instantly?", s:"Like no effort needed"},
   {q:"Do vibes matter more than words sometimes? 🎶", s:"Silent understanding hits different"},
   {q:"Are you someone who values emotional connection? 💞", s:"Asking for research"},
-  {q:"Is loyalty rare but priceless? 💎", s:"No discount coupons here"},
-  {q:"Understanding > perfection. Agree?", s:"Nobody is perfect anyway 😌"},
+  {q:"Is loyalty rare but priceless? 💎", s:"No discounts here"},
+  {q:"Understanding > perfection. Agree?", s:"Nobody is perfect 😌"},
   {q:"Late-night talks are special, right? 🌙", s:"Sleep is optional"},
   {q:"Can love grow slowly & beautifully? 🌹", s:"No rush. No drama."},
-  {q:"Would you like someone who chooses you daily? 🤍", s:"Not just on good days"},
+  {q:"Someone who chooses you daily?", s:"Not just on good days"},
   {q:"Love should feel safe, not confusing?", s:"Peace over chaos"},
-  {q:"Can love feel like home? 🏡", s:"Warm. Comfortable. Yours."},
-  {q:"Do you see a future with someone special?", s:"No spoilers yet 👀"},
-  {q:"Two imperfect people = perfect life?", s:"Math checks out 😄"},
-  {q:"Would you say yes to a forever promise? 💍", s:"Just curious…"},
-  {q:"Will you marry me? ❤️👰🤵", s:"Okay this one IS serious"}
+  {q:"Can love feel like home? 🏡", s:"Warm & calm"},
+  {q:"Do you see a future with someone special?", s:"No spoilers 👀"},
+  {q:"Two imperfect people = perfect life?", s:"Math checks out"},
+  {q:"Say yes to a forever promise? 💍", s:"Just curious"},
+  {q:"Will you marry me? ❤️👰🤵", s:"Okay this is serious"}
+];
+
+const noMessages = [
+  "Are you sure? 😏",
+  "Ouch… that hurt 🥲",
+  "Wrong button maybe? 👀",
+  "Try YES once 😄",
+  "This NO feels suspicious 🤨"
 ];
 
 function next() {
-  step++;
+  document.getElementById("yesSound").play();
+  yesScale += 0.06;
+  document.querySelector(".yes").style.transform = `scale(${yesScale})`;
+  createHeart();
 
+  step++;
   if (step < questions.length) {
     document.getElementById("question").innerHTML = questions[step].q;
     document.getElementById("subtext").innerHTML = questions[step].s;
+    document.getElementById("noBtn").innerText = "No 😌";
 
     if (step === questions.length - 1) {
       enableNoEscape();
     }
   } else {
+    launchConfetti();
     document.getElementById("box").innerHTML = `
       <h2>She said YES!!! 🎉💖</h2>
       <p>You just made my heart very happy 🥰</p>
@@ -134,17 +167,41 @@ function next() {
   }
 }
 
+function handleNoClick() {
+  const msg = noMessages[noClickCount % noMessages.length];
+  document.getElementById("subtext").innerHTML = msg;
+  noClickCount++;
+  const btn = document.getElementById("noBtn");
+  btn.classList.add("shake");
+  setTimeout(() => btn.classList.remove("shake"), 400);
+}
+
 function enableNoEscape() {
   const noBtn = document.getElementById("noBtn");
   noBtn.innerText = "NO 🙈";
 
   noBtn.addEventListener("mouseover", () => {
-    const x = Math.random() * 250 - 125;
-    const y = Math.random() * 250 - 125;
+    const x = Math.random() * 260 - 130;
+    const y = Math.random() * 260 - 130;
     noBtn.style.transform = `translate(${x}px, ${y}px)`;
   });
 }
+
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "💖";
+  heart.style.left = Math.random() * 100 + "vw";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 4000);
+}
+
+function launchConfetti() {
+  for (let i = 0; i < 30; i++) createHeart();
+}
 </script>
 
+</body>
+</html>
 </body>
 </html>

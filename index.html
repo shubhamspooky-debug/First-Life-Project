@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>A Small Game ❤️</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #ff9a9e, #fad0c4);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup {
+  background: linear-gradient(135deg, #ffffff, #fff5f7);
+  padding: 28px;
+  border-radius: 18px;
+  width: 340px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: pop 0.5s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+h2 {
+  font-family: 'Pacifico', cursive;
+  font-size: 22px;
+  color: #ff4d6d;
+  margin-bottom: 15px;
+}
+
+.sub {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 22px;
+  margin: 8px;
+  border: none;
+  border-radius: 25px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.yes {
+  background: linear-gradient(135deg, #ff4d6d, #ff758f);
+  color: white;
+  box-shadow: 0 8px 15px rgba(255,77,109,0.4);
+}
+
+.yes:hover {
+  transform: scale(1.08);
+}
+
+.no {
+  background: #eee;
+  color: #444;
+  position: relative;
+}
+
+.footer {
+  margin-top: 15px;
+  font-size: 11px;
+  color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="popup" id="box">
+  <h2 id="question">Hey you 😌</h2>
+  <div class="sub" id="subtext">Quick fun round. No pressure 😄</div>
+  <button class="yes" onclick="next()">Yes 😄</button>
+  <button class="no" id="noBtn" onclick="next()">Hmm okay</button>
+  <div class="footer">💗 totally harmless questions</div>
+</div>
+
+<script>
+let step = 0;
+
+const questions = [
+  {q:"Can I steal 30 seconds of your time? ⏳", s:"I promise I’ll return it 😇"},
+  {q:"Do you enjoy random & silly questions? 😄", s:"Because… here we are"},
+  {q:"Tea or coffee — choose wisely ☕", s:"Judgment may follow 👀"},
+  {q:"Do unexpected messages make you smile? 😊", s:"Especially from nice people"},
+  {q:"Do you believe some people enter life for a reason? 🌱", s:"Even unexpectedly"},
+  {q:"Ever felt comfortable talking to someone instantly?", s:"Like no effort needed"},
+  {q:"Do vibes matter more than words sometimes? 🎶", s:"Silent understanding hits different"},
+  {q:"Are you someone who values emotional connection? 💞", s:"Asking for research"},
+  {q:"Is loyalty rare but priceless? 💎", s:"No discount coupons here"},
+  {q:"Understanding > perfection. Agree?", s:"Nobody is perfect anyway 😌"},
+  {q:"Late-night talks are special, right? 🌙", s:"Sleep is optional"},
+  {q:"Can love grow slowly & beautifully? 🌹", s:"No rush. No drama."},
+  {q:"Would you like someone who chooses you daily? 🤍", s:"Not just on good days"},
+  {q:"Love should feel safe, not confusing?", s:"Peace over chaos"},
+  {q:"Can love feel like home? 🏡", s:"Warm. Comfortable. Yours."},
+  {q:"Do you see a future with someone special?", s:"No spoilers yet 👀"},
+  {q:"Two imperfect people = perfect life?", s:"Math checks out 😄"},
+  {q:"Would you say yes to a forever promise? 💍", s:"Just curious…"},
+  {q:"Will you marry me? ❤️👰🤵", s:"Okay this one IS serious"}
+];
+
+function next() {
+  step++;
+
+  if (step < questions.length) {
+    document.getElementById("question").innerHTML = questions[step].q;
+    document.getElementById("subtext").innerHTML = questions[step].s;
+
+    if (step === questions.length - 1) {
+      enableNoEscape();
+    }
+  } else {
+    document.getElementById("box").innerHTML = `
+      <h2>She said YES!!! 🎉💖</h2>
+      <p>You just made my heart very happy 🥰</p>
+      <h3>Forever starts now ❤️</h3>
+    `;
+  }
+}
+
+function enableNoEscape() {
+  const noBtn = document.getElementById("noBtn");
+  noBtn.innerText = "NO 🙈";
+
+  noBtn.addEventListener("mouseover", () => {
+    const x = Math.random() * 250 - 125;
+    const y = Math.random() * 250 - 125;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+}
+</script>
+
+</body>
+</html>
